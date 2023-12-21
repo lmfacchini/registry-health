@@ -4,6 +4,7 @@ import com.kan.registry.health.dist.exception.ServiceException;
 import com.kan.registry.health.dist.to.TransactionObject;
 import com.kan.registry.health.domain.AbstractDomain;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -29,7 +30,7 @@ public abstract class AbstractService<TO extends TransactionObject, D extends Ab
 
 
     protected D update(D document){
-        if(repository.existsById(document.getId())){
+        if(!repository.existsById(document.getId())){
             throw new ServiceException("Entity not exists.");
         }
         document.setUpdatedAt(LocalDateTime.now());
@@ -45,13 +46,18 @@ public abstract class AbstractService<TO extends TransactionObject, D extends Ab
     }
 
     public List<TO> parse(Collection<D> documents) {
-
+        if(CollectionUtils.isEmpty(documents)){
+            return List.of();
+        }
         return documents.stream().map(this::parse).collect(Collectors.toList());
 
     }
 
     public List<D> inverse(Collection<TO> documents) {
 
+        if(CollectionUtils.isEmpty(documents)){
+            return List.of();
+        }
         return documents.stream().map(this::parse).collect(Collectors.toList());
 
     }

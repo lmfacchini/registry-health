@@ -13,6 +13,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Set;
 
 @Service
 public class DocumentServiceImpl extends AbstractService<DocumentTO, Document, DocumentRepository> implements DocumentService {
@@ -56,7 +57,7 @@ public class DocumentServiceImpl extends AbstractService<DocumentTO, Document, D
 
             if(to.isNewContent()){
 
-                Path path = Files.createTempFile(Long.toHexString(to.getId()), to.getType());
+                Path path = Files.createTempFile(Long.toHexString(domain.getId()), domain.getType());
 
                 try(InputStream input = new BufferedInputStream(to.getFile().getInputStream());
                     OutputStream output = new BufferedOutputStream(new FileOutputStream(path.toFile()))){
@@ -75,5 +76,9 @@ public class DocumentServiceImpl extends AbstractService<DocumentTO, Document, D
             throw new ServiceException(ex);
         }
 
+    }
+
+    public void delete(Set<Long> ids) {
+        repository.deleteAllById(ids);
     }
 }

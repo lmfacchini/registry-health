@@ -26,6 +26,6 @@ public class Customer extends AbstractDomain{
     @Column
     private LocalDate birthDate;
 
-    @OneToMany(cascade = CascadeType.REMOVE)
+    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
     private List<Document> documents;
 }

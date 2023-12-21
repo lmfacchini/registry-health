@@ -5,6 +5,7 @@ import com.kan.registry.health.dist.service.CustomerService;
 import com.kan.registry.health.dist.to.CustomerTO;
 import com.kan.registry.health.dist.to.DocumentTO;
 import com.kan.registry.health.domain.Customer;
+import com.kan.registry.health.domain.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,8 +31,10 @@ public class CustomerServiceImpl extends AbstractService<CustomerTO, Customer, C
     @Override
     public CustomerTO registry(CustomerTO to) {
         Customer domain = parse(to);
+        List<DocumentTO> documents = to.getDocuments();
+        domain.setDocuments(null);
         final Customer saved = create(domain);
-        to.getDocuments().forEach(doc->{
+        documents.forEach(doc->{
             doc.setCustomerId(saved.getId());
             documentService.save(doc);
         });
@@ -58,6 +62,8 @@ public class CustomerServiceImpl extends AbstractService<CustomerTO, Customer, C
 
     @Override
     public void delete(Long id) {
+        Set<Long> ids = documentService.list(id).stream().map(DocumentTO::getId).collect(Collectors.toSet());
+        documentService.delete(ids);
         repository.deleteById(id);
     }
 
